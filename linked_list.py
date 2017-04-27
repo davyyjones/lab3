@@ -1,4 +1,4 @@
-#stuff
+
 
 # an AnyList is one of
 # - None
@@ -30,8 +30,7 @@ def add(listy, index, thing, count =0):
         if count == 0:
             return None
         raise IndexError
-    count += 1
-    return Pair(listy.first, add(listy.rest, index, thing, count))
+    return Pair(listy.first, add(listy.rest, index, thing, count+1))
 
 # list - > number
 # finds length of a list
@@ -43,17 +42,66 @@ def length(listy, len =0):
 # list index - > value
 # finds the value of an index position in a list
 def get(listy, index, count =0):
+    if count == index:
+        if listy == None:
+            raise IndexError
+        return listy.first
 
+    return get(listy.rest, index, count+1)
 
+# list index value - > list
+# replaces element at given index with given value
+def set(listy, index, thing, count =0):
+    if count == index:
+        if listy == None:
+            raise IndexError
+        return Pair(thing, listy.rest)
+
+    return Pair(listy.first, set(listy.rest, index, thing, count +1))
+
+# list index - > tuple
+# removes element at given index and returns removed element and new list
+def remove(listy, index, count =0):
+    if count == index:
+        if listy == None:
+            raise IndexError
+        return (listy.first)
+
+    return ( listy.first, (remove(listy.rest, index, count +1)))
+    #return (remove(listy.rest, index, count +1))
+
+    # if numlist.first > number:
+    #     return Pair(number,(Pair(numlist.first, numlist.rest)))
+    # return Pair(numlist.first, insert(numlist.rest,number))
 
 import unittest
 
 class testCase(unittest.TestCase):
 
+    def test_remove(self):
+
+        t_listy = Pair('Bob', Pair(42, Pair('socks', None)))
+       # self.assertEqual(('Bob', Pair(42, Pair('socks', None))), remove(t_listy, 0))
+        self.assertEqual(('socks', Pair('Bob', Pair(42, None))), remove(t_listy, 2))
+    #     #self.assertRaises(IndexError, remove, Pair('Bob', None), 0)
+    #     #self.assertRaises
+    #     print('1')
+    #     print (remove(Pair('Bob', None), 0))
+
+    def test_set(self):
+        t_listy = Pair('Bob', Pair(42, Pair('socks', None)))
+        self.assertEqual(Pair('Joe', Pair(42, Pair('socks', None))), set(t_listy, 0, 'Joe'))
+        self.assertEqual(Pair('Bob', Pair(24, Pair('socks', None))), set(t_listy, 1, 24))
+        self.assertRaises(IndexError, set, Pair('Bob', None), 1, 'Joe')
+        self.assertRaises(IndexError, set, None, 0, 'Joe')
+
     def test_get(self):
         t_listy = Pair('Bob', Pair(42, Pair('socks', None)))
-        self.assertRaises(IndexError, get, Pair('bob', None), 5)
-
+        self.assertRaises(IndexError, get, Pair('bob', None), 1)
+        self.assertRaises(IndexError, get, None, 0)
+        self.assertEqual('socks', get(t_listy, 2))
+        self.assertEqual('Bob', get(t_listy, 0))
+        #print(get(None, 0))
 
     def test_length(self):
         t_listy = Pair('Bob', Pair(42, Pair('socks', None)))
